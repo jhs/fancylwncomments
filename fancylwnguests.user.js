@@ -31,6 +31,20 @@ function getCommentHeading(comment) {
     return body.childNodes[1];
 }
 
+function getCommentId(comment) {
+    var idFinder = /^http:\/\/lwn.net\/Articles\/(\d+)\//;
+    var heading = getCommentHeading(comment);
+    var url = heading.childNodes[3].href
+
+    var result = idFinder.exec(url);
+    if(result == null) {
+        GM_log('Failed to find comment ID for url: ' + url);
+        return null;
+    }
+
+    return result[1];
+}
+
 function makeDrab(comment) {
     getCommentTitle(comment).style.background = drabCommentColor;
     comment.style.borderColor = drabCommentColor;
@@ -111,6 +125,9 @@ var comments = document.evaluate("//div[@class='CommentBox']", document, null,
 for(var a = 0; a < comments.snapshotLength; a++) {
     var comment = comments.snapshotItem(a);
     var hideButton = makeDynamic(comment);
+
+    var id = getCommentId(comment);
+    GM_setValue('seen-' + id, true);
 
     /* Guest comments get a drab color and collapse. */
     var commentHeading = getCommentHeading(comment);
