@@ -9,7 +9,7 @@
 */
 
 // ==UserScript==
-// @name          muzzleLWNGuests
+// @name          fancyLWNComments
 // @namespace     http://proven-corporation.com/
 // @description   Make guest postings on lwn.net hidden, but with a button to expose them if desired.
 // @include       http://lwn.net/Articles/*
