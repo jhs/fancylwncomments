@@ -11,7 +11,7 @@
 // ==UserScript==
 // @name          fancyLWNComments
 // @namespace     http://proven-corporation.com/
-// @description   Make guest postings on lwn.net hidden, but with a button to expose them if desired.
+// @description   Make guest and already-seen comments on lwn.net hidden.
 // @include       http://lwn.net/Articles/*
 // ==/UserScript==
 
