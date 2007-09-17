@@ -15,7 +15,17 @@
 // @include       http://lwn.net/Articles/*
 // ==/UserScript==
 
-var drabCommentColor = 'lightgrey';
+/* Regular expressions used in the script */
+var guestFinder = /(Posted .* by guest )/;
+var idFinder    = /^http:\/\/lwn.net\/Articles\/(\d+)\//;
+
+/* Comments can be seen/unseen, and by guest/subscriber. */
+var commentColors = {true: {}, false: {}};
+/* Key:       guest / seen */
+commentColors[true]  [true]  = '#ccff99';
+commentColors[true]  [false] = '#99ff99';
+commentColors[false] [true]  = '#ffff99';
+commentColors[false] [false] = '#ffcc99';
 
 /* These functions are sort of hard-coded and could change if the HTML of the site changes. */
 function getCommentTitle(comment) {
@@ -32,7 +42,6 @@ function getCommentHeading(comment) {
 }
 
 function getCommentId(comment) {
-    var idFinder = /^http:\/\/lwn.net\/Articles\/(\d+)\//;
     var heading = getCommentHeading(comment);
     var url = heading.childNodes[3].href
 
@@ -45,14 +54,16 @@ function getCommentId(comment) {
     return result[1];
 }
 
-function makeDrab(comment) {
-    getCommentTitle(comment).style.background = drabCommentColor;
-    comment.style.borderColor = drabCommentColor;
+function isCommentSeen(comment) {
+    var id = getCommentId(comment);
+    return GM_getValue('seen-' + id, false);
 }
 
-function makeNormal(comment) {
-    getCommentTitle(comment).style.background = null;
-    comment.style.borderColor = null;
+function isCommentGuest(comment) {
+    var result = guestFinder.exec(getCommentHeading(comment).textContent);
+    if(result == null)
+        return false;
+    return true;
 }
 
 /* Handle the clicking of the "View" button in guest comments (or "Hide" button if it was
@@ -69,22 +80,17 @@ var handleClick = function(event) {
     /* Either display or un-display the comment. */
     if(this.value == 'View') {
         this.value = 'Hide';
-
-        /* Make the subject heading and comment text normal. */
-        //makeNormal(comment);
         commentText.style.display = null;
     }
     else if(this.value == 'Hide') {
         this.value = 'View';
-
-        /* Make the subject heading unattractive and hide the comment text. */
-        //makeDrab(post);
         commentText.style.display = 'none';
     }
 };
 
-/* Make an LWN comment expandable/collapsable by adding a "Hide" button and putting the comment
- * text in a DIV so that it can be shown or hidden by the button.
+/* Make an LWN comment use the color based on who posted it and whether we've seen it already.
+ * Also make it expand/collapse with a "Hide" button.  All previously-seen posts and guest
+ * posts are automatically collapsed.
  */
 function makeDynamic(comment) {
     var commentBody = getCommentBody(comment);
@@ -106,39 +112,38 @@ function makeDynamic(comment) {
     commentText.style.display = null;
 
     /* Make the button. */
-    var displayButton   = document.createElement('input');
-    displayButton.type  = 'button';
-    displayButton.value = 'Hide';
-    displayButton.addEventListener('click', handleClick, false);
+    var hideButton   = document.createElement('input');
+    hideButton.type  = 'button';
+    hideButton.value = 'Hide';
+    hideButton.addEventListener('click', handleClick, false);
 
     var commentHeading = getCommentHeading(comment);
-    commentHeading.appendChild(displayButton);
+    commentHeading.appendChild(hideButton);
 
-    return displayButton;
-}
+    var seen  = isCommentSeen(comment);
+    var guest = isCommentGuest(comment);
+    var color = commentColors[guest][seen];
 
-var guestFinder = /(Posted .* by guest )/;
+    getCommentTitle(comment).style.background = color;
+    comment.style.borderColor = color;
 
-/* Loop through all comments and make them dynamic. */
-var comments = document.evaluate("//div[@class='CommentBox']", document, null,
-                                 XPathResult.UNORDERED_NODE_SNAPSHOT_TYPE, null);
-for(var a = 0; a < comments.snapshotLength; a++) {
-    var comment = comments.snapshotItem(a);
-    var hideButton = makeDynamic(comment);
-
-    var id = getCommentId(comment);
-    GM_setValue('seen-' + id, true);
-
-    /* Guest comments get a drab color and collapse. */
-    var commentHeading = getCommentHeading(comment);
-    var result = guestFinder.exec(commentHeading.textContent);
-    if(result) {
-        makeDrab(comment);
-
+    if(seen || guest) {
         /* Click the collapse button. */
         var e = document.createEvent('MouseEvents');
         e.initMouseEvent('click', true, true, window,
             0, 0, 0, 0, 0, false, false, false, false, 0, null);
         hideButton.dispatchEvent(e);
     }
+
+    if(!seen)
+        GM_setValue('seen-' + getCommentId(comment), true);
+}
+
+/* Loop through all comments and make them dynamic. */
+var comments = document.evaluate("//div[@class='CommentBox']", document, null,
+                                 XPathResult.UNORDERED_NODE_SNAPSHOT_TYPE, null);
+
+for(var a = 0; a < comments.snapshotLength; a++) {
+    var comment = comments.snapshotItem(a);
+    makeDynamic(comment);
 }
