@@ -16,7 +16,6 @@
 // ==/UserScript==
 
 var drabCommentColor = 'lightgrey';
-//var commentBoxColor  = null;            /* The normal comment box color; will be set once the page loads. */
 
 /* These functions are sort of hard-coded and could change if the HTML of the site changes. */
 function getCommentTitle(comment) {
@@ -111,17 +110,6 @@ var comments = document.evaluate("//div[@class='CommentBox']", document, null,
                                  XPathResult.UNORDERED_NODE_SNAPSHOT_TYPE, null);
 for(var a = 0; a < comments.snapshotLength; a++) {
     var comment = comments.snapshotItem(a);
-
-    /* If the standard comment box color is unknown, then remember it
-     * (default is #FFCC99 or rgb(255, 204, 153) in LWN's standard scheme.
-     */
-    /*
-    if(! commentBoxColor) {
-        var commentStyle = document.defaultView.getComputedStyle(comment, null);
-        commentBoxColor = commentStyle.getPropertyValue('border-left-color');
-    }
-    */
-
     var hideButton = makeDynamic(comment);
 
     /* Guest comments get a drab color and collapse. */
