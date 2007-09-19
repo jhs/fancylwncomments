@@ -140,10 +140,14 @@ function makeDynamic(comment) {
 }
 
 /* Loop through all comments and make them dynamic. */
-var comments = document.evaluate("//div[@class='CommentBox']", document, null,
-                                 XPathResult.UNORDERED_NODE_SNAPSHOT_TYPE, null);
+function main() {
+    var comments = document.evaluate("//div[@class='CommentBox']", document, null,
+                                     XPathResult.UNORDERED_NODE_SNAPSHOT_TYPE, null);
 
-for(var a = 0; a < comments.snapshotLength; a++) {
-    var comment = comments.snapshotItem(a);
-    makeDynamic(comment);
+    for(var a = 0; a < comments.snapshotLength; a++) {
+        var comment = comments.snapshotItem(a);
+        makeDynamic(comment);
+    }
 }
+
+window.addEventListener('load', main, true);
