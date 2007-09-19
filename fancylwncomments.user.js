@@ -13,7 +13,7 @@
 // ==UserScript==
 // @name          fancyLWNComments
 // @namespace     http://proven-corporation.com/
-// @description   Make guest and already-seen comments on lwn.net hidden.
+// @description   Make guest and already-read comments on lwn.net hidden.
 // @include       http://lwn.net/Articles/*
 // ==/UserScript==
 
