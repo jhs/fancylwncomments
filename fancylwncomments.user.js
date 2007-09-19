@@ -35,20 +35,17 @@ var PLUS = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAkAAAAJCAYAAADgkQYQAA
 var MINUS = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAkAAAAJCAYAAADgkQYQAAAABmJLR0QA%2FwD%2FAP%2BgvaeTAAAACXBIWXMAAAsTAAALEwEAmpwYAAAAB3RJTUUH1wkTCwcVopqB%2BgAAAC5JREFUGNNjbGho%2BM9ACBBS1NDQ8J%2BJgQhAlCIWJDY2axnRFTFSZB1RihiJCScAsJALEOLrEQYAAAAASUVORK5CYII%3D';
 
 
-/* Conveniently search via XPath.  The optional second argument is a node
- * to search within (defaults to the whole document.)  If nothing matches,
+/* Conveniently search via XPath.  If nothing matches,
  * return null.  For one match, return the element.  For multiple matches,
  * return an array of elements.  The forceList option will force the
  * function to return a list, regardless of the result.
  */
-function xpath(path, node, forceList) {
-    if(node === undefined)
-        node = document;
+function xpath(path, forceList) {
     if(forceList === undefined)
         forceList = false;
 
     var result = [];
-    var nodes = document.evaluate(path, node, null,
+    var nodes = document.evaluate(path, document, null,
                                   XPathResult.UNORDERED_NODE_SNAPSHOT_TYPE, null );
     for(var a = 0; a < nodes.snapshotLength; a++)
         result.push(nodes.snapshotItem(a));
@@ -278,14 +275,14 @@ function main() {
 
         /* The expand all button opens all currently hidden comments. */
         document.getElementById('expandAll').addEventListener('click', function(ev) {
-            var buttons = xpath('//input[@class="commentToggler"][@value="View"]', undefined, true);
+            var buttons = xpath('//input[@class="commentToggler"][@value="View"]', true);
             for(var a in buttons)
                 click(buttons[a]);
         }, false);
 
         /* The collapse all button hides all currently open comments. */
         document.getElementById('hideAll').addEventListener('click', function(ev) {
-            var buttons = xpath('//input[@class="commentToggler"][@value="Hide"]', undefined, true);
+            var buttons = xpath('//input[@class="commentToggler"][@value="Hide"]', true);
             for(var a in buttons)
                 click(buttons[a]);
         }, false);
@@ -308,7 +305,7 @@ function main() {
     }
 
     /* Loop through all comments and make them dynamic. */
-    var comments = xpath('//div[@class="CommentBox"]');
+    var comments = xpath('//div[@class="CommentBox"]', true);
     for(var a = 0; a < comments.length; a++)
         makeDynamic(comments[a]);
 }
