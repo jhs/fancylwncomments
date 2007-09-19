@@ -287,6 +287,20 @@ function main() {
                 click(buttons[a]);
         }, false);
 
+        /* Do the mark read button. */
+        document.getElementById('markRead').addEventListener('click', function(ev) {
+            var comments = xpath('//div[@class="CommentBox"]', true);
+            for(var a in comments)
+                GM_setValue('read-' + getCommentId(comments[a]), true);
+        }, false);
+
+        /* Do the mark read button. */
+        document.getElementById('markUnread').addEventListener('click', function(ev) {
+            var comments = xpath('//div[@class="CommentBox"]', true);
+            for(var a in comments)
+                GM_setValue('read-' + getCommentId(comments[a]), false);
+        }, false);
+
         var expander = document.getElementById('commentExpander');
         expander.state = 'closed';
         expander.addEventListener('click', function(ev) {
