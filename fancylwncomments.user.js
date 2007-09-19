@@ -25,8 +25,8 @@ var colors = {
 };
 
 var switches = {
-    'hide guest'  : GM_getValue('hide guest'  , true),
-    'hide read'   : GM_getValue('hide read'   , true),
+    'hide guest'  : GM_getValue('hide guest'  , false),
+    'hide read'   : GM_getValue('hide read'   , false),
     'full hilight': GM_getValue('full hilight', false),
 };
 
