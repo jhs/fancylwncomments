@@ -13,7 +13,7 @@
 // ==UserScript==
 // @name          fancyLWNComments
 // @namespace     http://proven-corporation.com/
-// @description   Make guest and already-read comments on lwn.net hidden.
+// @description   Improved comment browsing in lwn.net: ignore guest posts, previously-read posts with color coding.
 // @include       http://lwn.net/Articles/*
 // ==/UserScript==
 
