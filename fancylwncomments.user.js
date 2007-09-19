@@ -292,7 +292,6 @@ function main() {
              '<p style="text-indent: 0px; margin: 0px;">' +
               '<input type="button" id="markUnread" value="Mark all Unread" style="margin-bottom: 2px; width: 100%" />' +
              '</p>' +
-             '<p id="reloadNotice" style="display: none; text-indent: 0px; margin: 0px; color: red; font-size: large; font-weight: bold; font-style: italic">Please reload</p>' +
             '</div>';
 
         /* Attach this into the DOM tree after the first sidebox. */
