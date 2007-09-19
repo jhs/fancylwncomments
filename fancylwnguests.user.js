@@ -15,14 +15,12 @@
 // @include       http://lwn.net/Articles/*
 // ==/UserScript==
 
-/* Comments can be seen/unseen, and by guest/subscriber.
- * The first column is guest status, the second column is whether the comment has been seen.
- */
-var commentColors = {true: {}, false: {}};
-commentColors[true]  [true]  = '#ccff99';
-commentColors[true]  [false] = '#99ff99';
-commentColors[false] [true]  = '#ffff99';
-commentColors[false] [false] = '#ffcc99';
+var defaultColors = {
+    'guest read'   : '#ccff99',
+    'guest unread' : '#99ff99',
+    'member read'  : '#ffff99',
+    'member unread': '#ffcc99',
+};
 
 /* "Constants" */
 var PLUS = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAkAAAAJCAYAAADgkQYQAAAABmJLR0QA%2FwD%2FAP%2BgvaeTAAAACXBIWXMAAAsTAAALEwEAmpwYAAAAB3RJTUUH1wkTCwQhqAMmjAAAADZJREFUGNNjbGho%2BM9ACBBS1NDQ8J8JiziGJiYGIgALDhNgbEZ0RYxIChhJtg6bIkYMAWLCCQC%2FUA4P3D7t2wAAAABJRU5ErkJggg%3D%3D';
@@ -152,8 +150,18 @@ function makeDynamic(comment) {
 
     var seen  = isCommentSeen(comment);
     var guest = isCommentGuest(comment);
-    var color = commentColors[guest][seen];
 
+    var postType;
+    if(guest)
+        postType = 'guest ';
+    else
+        postType = 'member ';
+    if(seen)
+        postType += 'read';
+    else
+        postType += 'unread';
+
+    var color = GM_getValue(postType, defaultColors[postType]);
     getCommentTitle(comment).style.background = color;
     comment.style.borderColor = color;
 
@@ -192,28 +200,32 @@ function main() {
              '</p>' +
              '<p>' +
               'Unread member' +
-              '<a style="position: absolute; right: 0; border: 1px solid black; width: 1em; height: 1em; background: ' +
-               commentColors[false][false] + '"></a>' +
+              '<a id="member unread" style="position: absolute; right: 0; cursor: pointer; border: 1px solid black; width: 1em; height: 1em"></a>'+
              '</p>' +
              '<p>' +
               'Read member' +
-              '<a style="position: absolute; right: 0; border: 1px solid black; width: 1em; height: 1em; background: ' +
-               commentColors[false][true] + '"></a>' +
+              '<a id="member read" style="position: absolute; right: 0; cursor: pointer; border: 1px solid black; width: 1em; height: 1em"></a>'+
              '</p>' +
              '<p>' +
               'Unread guest' +
-              '<a style="position: absolute; right: 0; border: 1px solid black; width: 1em; height: 1em; background: ' +
-               commentColors[true][false] + '"></a>' +
+              '<a id="guest unread" style="position: absolute; right: 0; cursor: pointer; border: 1px solid black; width: 1em; height: 1em"></a>'+
              '</p>' +
              '<p>' +
               'Read guest' +
-              '<a style="position: absolute; right: 0; border: 1px solid black; width: 1em; height: 1em; background: ' +
-               commentColors[true][true] + '"></a>' +
+              '<a id="guest read" style="position: absolute; right: 0; cursor: pointer; border: 1px solid black; width: 1em; height: 1em"></a>'+
              '</p>' +
             '</div>';
 
-        /* Attach this after the first sidebox. */
+        /* Attach this into the DOM tree after the first sidebox. */
         sideBox.parentNode.insertBefore(configBox, sideBox.nextSibling);
+
+        /* Set the values to match the settings. */
+        document.getElementById('hideGuest').checked = GM_getValue('hide guest', true);
+
+        for(var colorType in defaultColors) {
+            var node = document.getElementById(colorType);
+            node.style.background = GM_getValue(colorType, defaultColors[colorType]);
+        }
 
         var expander = document.getElementById('commentExpander');
         expander.state = 'closed';
