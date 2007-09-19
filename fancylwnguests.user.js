@@ -102,7 +102,7 @@ function isCommentGuest(comment) {
  * walk up the DOM ancestry to the actual comments and make them visible/invisible or
  * attractive/unattractive as appropriate.
  */
-var handleClick = function(event) {
+var handleClick = function(ev) {
     var comment        = this.parentNode.parentNode.parentNode;
     var commentBody    = getCommentBody(comment);
     var commentText    = commentBody.childNodes[2];
@@ -182,13 +182,10 @@ function main() {
         configBox.className = 'SideBox';
         configBox.innerHTML =
             '<p class="Header">' +
-             '<a href="#" id="commentExpander">' +
-              '<img style="border: 0px" src="' + PLUS + '" />' +
-             '</a>' +
-             ' Comments' +
+            '<img style="cursor: pointer" id="commentExpander" src="'+ PLUS +'" />' +
+            ' Comments' +
             '</p>' +
-            //'<div id="commentSettings" style="position: relative; padding-left: 1em; display: none">' +
-            '<div id="commentSettings" style="position: relative; padding-left: 1em; display: block">' +
+            '<div id="commentSettings" style="position: relative; padding-left: 1em; display: none">' +
              '<p>' +
               '<label for="hideGuest">Hide guests</label>' +
               '<input type="checkbox" id="hideGuest" name="hideGuest" style="position: absolute; right: 0" />' +
@@ -217,6 +214,22 @@ function main() {
 
         /* Attach this after the first sidebox. */
         sideBox.parentNode.insertBefore(configBox, sideBox.nextSibling);
+
+        var expander = document.getElementById('commentExpander');
+        expander.state = 'closed';
+        expander.addEventListener('click', function(ev) {
+            var commentBox = document.getElementById('commentSettings');
+            if(this.src == PLUS) {
+                /* Open the config panel. */
+                commentBox.style.display = null;
+                this.src = MINUS;
+            }
+            else if(this.src == MINUS) {
+                /* Close the config panel. */
+                commentBox.style.display = 'none';
+                this.src = PLUS;
+            }
+        }, false);
     }
 
     /* Loop through all comments and make them dynamic. */
