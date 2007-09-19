@@ -38,25 +38,37 @@ var MINUS = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAkAAAAJCAYAAADgkQYQA
 /* Conveniently search via XPath.  The optional second argument is a node
  * to search within (defaults to the whole document.)  If nothing matches,
  * return null.  For one match, return the element.  For multiple matches,
- * return an array of elements.
+ * return an array of elements.  The forceList option will force the
+ * function to return a list, regardless of the result.
  */
-function xpath(path, node) {
+function xpath(path, node, forceList) {
     if(node === undefined)
         node = document;
+    if(forceList === undefined)
+        forceList = false;
 
+    var result = [];
     var nodes = document.evaluate(path, node, null,
                                   XPathResult.UNORDERED_NODE_SNAPSHOT_TYPE, null );
-
-    if(nodes.snapshotLength == 0)
-        return null;
-    else if(nodes.snapshotLength == 1)
-        return nodes.snapshotItem(0);
-    else {
-        var result = [];
-        for(var a = 0; a < nodes.snapshotLength; a++)
-            result.push(nodes.snapshotItem(a));
+    for(var a = 0; a < nodes.snapshotLength; a++)
+        result.push(nodes.snapshotItem(a));
+    if(forceList)
         return result;
-    }
+
+    if(result.length == 0)
+        return null;
+    else if(result.length == 1)
+        return result[0];
+    else
+        return result;
+}
+
+/* Simulate a click on a node. */
+function click(node) {
+    var e = document.createEvent('MouseEvents');
+    e.initMouseEvent('click', true, true, window,
+        0, 0, 0, 0, 0, false, false, false, false, 0, null);
+    node.dispatchEvent(e);
 }
 
 /* Regular expressions used in the script */
@@ -151,6 +163,7 @@ function makeDynamic(comment) {
     var hideButton   = document.createElement('input');
     hideButton.type  = 'button';
     hideButton.value = 'Hide';
+    hideButton.className = 'commentToggler';
     hideButton.addEventListener('click', handleClick, false);
 
     var commentHeading = getCommentHeading(comment);
@@ -175,13 +188,8 @@ function makeDynamic(comment) {
     if(switches['full hilight'])
         commentBody.style.background = color;
 
-    if((switches['hide guest'] && guest) || (switches['hide read'] && read)) {
-        /* Click the collapse button. */
-        var e = document.createEvent('MouseEvents');
-        e.initMouseEvent('click', true, true, window,
-            0, 0, 0, 0, 0, false, false, false, false, 0, null);
-        hideButton.dispatchEvent(e);
-    }
+    if((switches['hide guest'] && guest) || (switches['hide read'] && read))
+        click(hideButton);
 
     if(!read)
         GM_setValue('read-' + getCommentId(comment), true);
@@ -236,7 +244,7 @@ function main() {
               '<input type="button" id="expandAll" value="Expand All" style="margin-bottom: 2px; width: 100%" />' +
              '</p>' +
              '<p style="text-indent: 0px; margin: 0px;">' +
-              '<input type="button" id="hideAll" value="Collapse All" style="margin-bottom: 2px; width: 100%" />' +
+              '<input type="button" id="hideAll" value="Hide All" style="margin-bottom: 2px; width: 100%" />' +
              '</p>' +
              '<p style="text-indent: 0px; margin: 0px;">' +
               '<input type="button" id="markRead" value="Mark all Read" style="margin-bottom: 2px; width: 100%" />' +
@@ -262,10 +270,25 @@ function main() {
             document.getElementById(optName).checked = switches[optName];
         }
 
+        /* Do the color boxes. */
         for(var postType in colors) {
             var node = document.getElementById(postType);
             node.style.background = colors[postType];
         }
+
+        /* The expand all button opens all currently hidden comments. */
+        document.getElementById('expandAll').addEventListener('click', function(ev) {
+            var buttons = xpath('//input[@class="commentToggler"][@value="View"]', undefined, true);
+            for(var a in buttons)
+                click(buttons[a]);
+        }, false);
+
+        /* The collapse all button hides all currently open comments. */
+        document.getElementById('hideAll').addEventListener('click', function(ev) {
+            var buttons = xpath('//input[@class="commentToggler"][@value="Hide"]', undefined, true);
+            for(var a in buttons)
+                click(buttons[a]);
+        }, false);
 
         var expander = document.getElementById('commentExpander');
         expander.state = 'closed';
