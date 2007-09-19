@@ -232,13 +232,21 @@ function main() {
               'Read guest' +
               '<a id="guest read" style="position: absolute; right: 0; cursor: pointer; border: 1px solid black; width: 1em; height: 1em"></a>'+
              '</p>' +
+             '<p id="reloadNotice" style="display: none; color: red; font-size: large; font-weight: bold; font-style: italic">Please reload</p>' +
             '</div>';
 
         /* Attach this into the DOM tree after the first sidebox. */
         sideBox.parentNode.insertBefore(configBox, sideBox.nextSibling);
 
-        /* Set the values to match the settings. */
+        /* Do the boolean options (switches) */
         for(var optName in switches) {
+            var box = document.getElementById(optName);
+            box.checked = switches[optName];
+            box.addEventListener('change', function(ev) {
+                GM_setValue(this.id, this.checked);
+                document.getElementById('reloadNotice').style.display = null;
+            }, false);
+
             document.getElementById(optName).checked = switches[optName];
         }
 
