@@ -24,9 +24,11 @@ var colors = {
     'member unread' : GM_getValue('member unread', '#ffcc99'),
 };
 
-var hideGuest   = GM_getValue('hide guest'  , true);
-var hideRead    = GM_getValue('hide read'   , true);
-var fullHilight = GM_getValue('full hilight', false);
+var switches = {
+    'hide guest'  : GM_getValue('hide guest'  , true),
+    'hide read'   : GM_getValue('hide read'   , true),
+    'full hilight': GM_getValue('full hilight', false),
+};
 
 /* "Constants" */
 var PLUS = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAkAAAAJCAYAAADgkQYQAAAABmJLR0QA%2FwD%2FAP%2BgvaeTAAAACXBIWXMAAAsTAAALEwEAmpwYAAAAB3RJTUUH1wkTCwQhqAMmjAAAADZJREFUGNNjbGho%2BM9ACBBS1NDQ8J8JiziGJiYGIgALDhNgbEZ0RYxIChhJtg6bIkYMAWLCCQC%2FUA4P3D7t2wAAAABJRU5ErkJggg%3D%3D';
@@ -170,10 +172,10 @@ function makeDynamic(comment) {
     var color = colors[postType];
     getCommentTitle(comment).style.background = color;
     comment.style.borderColor = color;
-    if(fullHilight)
+    if(switches['full hilight'])
         commentBody.style.background = color;
 
-    if((hideGuest && guest) || (hideRead && read)) {
+    if((switches['hide guest'] && guest) || (switches['hide read'] && read)) {
         /* Click the collapse button. */
         var e = document.createEvent('MouseEvents');
         e.initMouseEvent('click', true, true, window,
@@ -203,16 +205,16 @@ function main() {
             '</p>' +
             '<div id="commentSettings" style="position: relative; padding-left: 1em; display: none">' +
              '<p>' +
-              '<label for="hideGuest">Hide guests</label>' +
-              '<input type="checkbox" id="hideGuest" name="hideGuest" style="position: absolute; right: 0" />' +
+              '<label for="hide guest">Hide guests</label>' +
+              '<input type="checkbox" id="hide guest" style="position: absolute; right: 0" />' +
              '</p>' +
              '<p>' +
-              '<label for="hideRead">Hide read</label>' +
-              '<input type="checkbox" id="hideRead" name="hideRead" style="position: absolute; right: 0" />' +
+              '<label for="hide read">Hide read</label>' +
+              '<input type="checkbox" id="hide read" style="position: absolute; right: 0" />' +
              '</p>' +
              '<p>' +
-              '<label for="fullHilight">More hilighting</label>' +
-              '<input type="checkbox" id="fullHilight" name="fullHilight" style="position: absolute; right: 0" />' +
+              '<label for="full hilight">More hilighting</label>' +
+              '<input type="checkbox" id="full hilight" style="position: absolute; right: 0" />' +
              '</p>' +
              '<p>' +
               'Unread member' +
@@ -236,9 +238,9 @@ function main() {
         sideBox.parentNode.insertBefore(configBox, sideBox.nextSibling);
 
         /* Set the values to match the settings. */
-        document.getElementById('hideGuest').checked   = hideGuest;
-        document.getElementById('hideRead').checked    = hideRead;
-        document.getElementById('fullHilight').checked = fullHilight;
+        for(var optName in switches) {
+            document.getElementById(optName).checked = switches[optName];
+        }
 
         for(var postType in colors) {
             var node = document.getElementById(postType);
