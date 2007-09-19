@@ -15,17 +15,47 @@
 // @include       http://lwn.net/Articles/*
 // ==/UserScript==
 
-/* Regular expressions used in the script */
-var guestFinder = /(Posted .* by guest )/;
-var idFinder    = /^http:\/\/lwn.net\/Articles\/(\d+)\//;
-
-/* Comments can be seen/unseen, and by guest/subscriber. */
+/* Comments can be seen/unseen, and by guest/subscriber.
+ * The first column is guest status, the second column is whether the comment has been seen.
+ */
 var commentColors = {true: {}, false: {}};
-/* Key:       guest / seen */
 commentColors[true]  [true]  = '#ccff99';
 commentColors[true]  [false] = '#99ff99';
 commentColors[false] [true]  = '#ffff99';
 commentColors[false] [false] = '#ffcc99';
+
+/* "Constants" */
+var PLUS = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAkAAAAJCAYAAADgkQYQAAAABmJLR0QA%2FwD%2FAP%2BgvaeTAAAACXBIWXMAAAsTAAALEwEAmpwYAAAAB3RJTUUH1wkTCwQhqAMmjAAAADZJREFUGNNjbGho%2BM9ACBBS1NDQ8J8JiziGJiYGIgALDhNgbEZ0RYxIChhJtg6bIkYMAWLCCQC%2FUA4P3D7t2wAAAABJRU5ErkJggg%3D%3D';
+var MINUS = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAkAAAAJCAYAAADgkQYQAAAABmJLR0QA%2FwD%2FAP%2BgvaeTAAAACXBIWXMAAAsTAAALEwEAmpwYAAAAB3RJTUUH1wkTCwcVopqB%2BgAAAC5JREFUGNNjbGho%2BM9ACBBS1NDQ8J%2BJgQhAlCIWJDY2axnRFTFSZB1RihiJCScAsJALEOLrEQYAAAAASUVORK5CYII%3D';
+
+
+/* Conveniently search via XPath.  The optional second argument is a node
+ * to search within (defaults to the whole document.)  If nothing matches,
+ * return null.  For one match, return the element.  For multiple matches,
+ * return an array of elements.
+ */
+function xpath(path, node) {
+    if(node === undefined)
+        node = document;
+
+    var nodes = document.evaluate(path, node, null,
+                                  XPathResult.UNORDERED_NODE_SNAPSHOT_TYPE, null );
+
+    if(nodes.snapshotLength == 0)
+        return null;
+    else if(nodes.snapshotLength == 1)
+        return nodes.snapshotItem(0);
+    else {
+        var result = [];
+        for(var a = 0; a < nodes.snapshotLength; a++)
+            result.push(nodes.snapshotItem(a));
+        return result;
+    }
+}
+
+/* Regular expressions used in the script */
+var guestFinder = /(Posted .* by guest )/;
+var idFinder    = /^http:\/\/lwn.net\/Articles\/(\d+)\//;
 
 /* These functions are sort of hard-coded and could change if the HTML of the site changes. */
 function getCommentTitle(comment) {
@@ -139,15 +169,60 @@ function makeDynamic(comment) {
         GM_setValue('seen-' + getCommentId(comment), true);
 }
 
-/* Loop through all comments and make them dynamic. */
+/* This is the main program entry after the page loads completely. */
 function main() {
-    var comments = document.evaluate("//div[@class='CommentBox']", document, null,
-                                     XPathResult.UNORDERED_NODE_SNAPSHOT_TYPE, null);
-
-    for(var a = 0; a < comments.snapshotLength; a++) {
-        var comment = comments.snapshotItem(a);
-        makeDynamic(comment);
+    /* Add the config section after the "Logged in as..." stuff. */
+    var sideBox = xpath('//div[@class="SideBox"][1]');
+    if(!sideBox) {
+        /* TODO disable this script because it seems to fail to work with the site's HTML. */
+        return;
     }
+    else {
+        var configBox = document.createElement('div');
+        configBox.className = 'SideBox';
+        configBox.innerHTML =
+            '<p class="Header">' +
+             '<a href="#" id="commentExpander">' +
+              '<img style="border: 0px" src="' + PLUS + '" />' +
+             '</a>' +
+             ' Comments' +
+            '</p>' +
+            //'<div id="commentSettings" style="position: relative; padding-left: 1em; display: none">' +
+            '<div id="commentSettings" style="position: relative; padding-left: 1em; display: block">' +
+             '<p>' +
+              '<label for="hideGuest">Hide guests</label>' +
+              '<input type="checkbox" id="hideGuest" name="hideGuest" style="position: absolute; right: 0" />' +
+             '</p>' +
+             '<p>' +
+              'Unread member' +
+              '<a style="position: absolute; right: 0; border: 1px solid black; width: 1em; height: 1em; background: ' +
+               commentColors[false][false] + '"></a>' +
+             '</p>' +
+             '<p>' +
+              'Read member' +
+              '<a style="position: absolute; right: 0; border: 1px solid black; width: 1em; height: 1em; background: ' +
+               commentColors[false][true] + '"></a>' +
+             '</p>' +
+             '<p>' +
+              'Unread guest' +
+              '<a style="position: absolute; right: 0; border: 1px solid black; width: 1em; height: 1em; background: ' +
+               commentColors[true][false] + '"></a>' +
+             '</p>' +
+             '<p>' +
+              'Read guest' +
+              '<a style="position: absolute; right: 0; border: 1px solid black; width: 1em; height: 1em; background: ' +
+               commentColors[true][true] + '"></a>' +
+             '</p>' +
+            '</div>';
+
+        /* Attach this after the first sidebox. */
+        sideBox.parentNode.insertBefore(configBox, sideBox.nextSibling);
+    }
+
+    /* Loop through all comments and make them dynamic. */
+    var comments = xpath('//div[@class="CommentBox"]');
+    for(var a = 0; a < comments.length; a++)
+        makeDynamic(comments[a]);
 }
 
 window.addEventListener('load', main, true);
