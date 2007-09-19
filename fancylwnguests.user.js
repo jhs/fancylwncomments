@@ -15,12 +15,16 @@
 // @include       http://lwn.net/Articles/*
 // ==/UserScript==
 
-var defaultColors = {
-    'guest read'   : '#ccff99',
-    'guest unread' : '#99ff99',
-    'member read'  : '#ffff99',
-    'member unread': '#ffcc99',
+var colors = {
+    'guest read'    : GM_getValue('guest read'   , '#ccff99'),
+    'guest unread'  : GM_getValue('guest unread' , '#99ff99'),
+    'member read'   : GM_getValue('member read'  , '#ffff99'),
+    'member unread' : GM_getValue('member unread', '#ffcc99'),
 };
+
+var hideGuest   = GM_getValue('hide guest'  , true);
+var hideRead    = GM_getValue('hide read'   , true);
+var fullHilight = GM_getValue('full hilight', false);
 
 /* "Constants" */
 var PLUS = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAkAAAAJCAYAAADgkQYQAAAABmJLR0QA%2FwD%2FAP%2BgvaeTAAAACXBIWXMAAAsTAAALEwEAmpwYAAAAB3RJTUUH1wkTCwQhqAMmjAAAADZJREFUGNNjbGho%2BM9ACBBS1NDQ8J8JiziGJiYGIgALDhNgbEZ0RYxIChhJtg6bIkYMAWLCCQC%2FUA4P3D7t2wAAAABJRU5ErkJggg%3D%3D';
@@ -84,7 +88,7 @@ function getCommentId(comment) {
 
 function isCommentSeen(comment) {
     var id = getCommentId(comment);
-    return GM_getValue('seen-' + id, false);
+    return GM_getValue('read-' + id, false);
 }
 
 function isCommentGuest(comment) {
@@ -148,7 +152,7 @@ function makeDynamic(comment) {
     var commentHeading = getCommentHeading(comment);
     commentHeading.appendChild(hideButton);
 
-    var seen  = isCommentSeen(comment);
+    var read  = isCommentSeen(comment);
     var guest = isCommentGuest(comment);
 
     var postType;
@@ -156,16 +160,18 @@ function makeDynamic(comment) {
         postType = 'guest ';
     else
         postType = 'member ';
-    if(seen)
+    if(read)
         postType += 'read';
     else
         postType += 'unread';
 
-    var color = GM_getValue(postType, defaultColors[postType]);
+    var color = colors[postType];
     getCommentTitle(comment).style.background = color;
     comment.style.borderColor = color;
+    if(fullHilight)
+        commentBody.style.background = color;
 
-    if(seen || guest) {
+    if((hideGuest && guest) || (hideRead && read)) {
         /* Click the collapse button. */
         var e = document.createEvent('MouseEvents');
         e.initMouseEvent('click', true, true, window,
@@ -173,8 +179,8 @@ function makeDynamic(comment) {
         hideButton.dispatchEvent(e);
     }
 
-    if(!seen)
-        GM_setValue('seen-' + getCommentId(comment), true);
+    if(!read)
+        GM_setValue('read-' + getCommentId(comment), true);
 }
 
 /* This is the main program entry after the page loads completely. */
@@ -199,6 +205,14 @@ function main() {
               '<input type="checkbox" id="hideGuest" name="hideGuest" style="position: absolute; right: 0" />' +
              '</p>' +
              '<p>' +
+              '<label for="hideRead">Hide read</label>' +
+              '<input type="checkbox" id="hideRead" name="hideRead" style="position: absolute; right: 0" />' +
+             '</p>' +
+             '<p>' +
+              '<label for="fullHilight">More hilighting</label>' +
+              '<input type="checkbox" id="fullHilight" name="fullHilight" style="position: absolute; right: 0" />' +
+             '</p>' +
+             '<p>' +
               'Unread member' +
               '<a id="member unread" style="position: absolute; right: 0; cursor: pointer; border: 1px solid black; width: 1em; height: 1em"></a>'+
              '</p>' +
@@ -220,11 +234,13 @@ function main() {
         sideBox.parentNode.insertBefore(configBox, sideBox.nextSibling);
 
         /* Set the values to match the settings. */
-        document.getElementById('hideGuest').checked = GM_getValue('hide guest', true);
+        document.getElementById('hideGuest').checked   = hideGuest;
+        document.getElementById('hideRead').checked    = hideRead;
+        document.getElementById('fullHilight').checked = fullHilight;
 
-        for(var colorType in defaultColors) {
-            var node = document.getElementById(colorType);
-            node.style.background = GM_getValue(colorType, defaultColors[colorType]);
+        for(var postType in colors) {
+            var node = document.getElementById(postType);
+            node.style.background = colors[postType];
         }
 
         var expander = document.getElementById('commentExpander');
