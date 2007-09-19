@@ -40,12 +40,14 @@ var MINUS = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAkAAAAJCAYAAADgkQYQA
  * return an array of elements.  The forceList option will force the
  * function to return a list, regardless of the result.
  */
-function xpath(path, forceList) {
+function xpath(path, forceList, node) {
     if(forceList === undefined)
         forceList = false;
+    if(node === undefined)
+        node = document
 
     var result = [];
-    var nodes = document.evaluate(path, document, null,
+    var nodes = document.evaluate(path, node, null,
                                   XPathResult.UNORDERED_NODE_SNAPSHOT_TYPE, null );
     for(var a = 0; a < nodes.snapshotLength; a++)
         result.push(nodes.snapshotItem(a));
@@ -86,6 +88,12 @@ function getCommentHeading(comment) {
     return body.childNodes[1];
 }
 
+function getCommentText(comment) {
+    /* This function only works on comments processed by makeDynamic(). */
+    var body = getCommentBody(comment);
+    return body.childNodes[2];
+}
+
 function getCommentId(comment) {
     var heading = getCommentHeading(comment);
     var url = heading.childNodes[3].href
@@ -111,6 +119,10 @@ function isCommentGuest(comment) {
     return true;
 }
 
+function isCommentVisible(comment) {
+    return (getCommentText(comment).style.display == "")
+}
+
 /* Handle the clicking of the "View" button in guest comments (or "Hide" button if it was
  * already clicked before -- it's a toggle).  The "this" variable is therefore bound to the
  * <input> button.  Since a button was conveniently embedded in each comment, just
@@ -133,9 +145,8 @@ var handleClick = function(ev) {
     }
 };
 
-/* Make an LWN comment use the color based on who posted it and whether we've seen it already.
- * Also make it expand/collapse with a "Hide" button.  All previously-seen posts and guest
- * posts are automatically collapsed.
+/* Prepare an LWN comment to be ready for manipulation.  This will rearrange the DOM a little
+ * to put the comment body in its own DIV and add a View/Hide button.
  */
 function makeDynamic(comment) {
     var commentBody = getCommentBody(comment);
@@ -165,9 +176,20 @@ function makeDynamic(comment) {
 
     var commentHeading = getCommentHeading(comment);
     commentHeading.appendChild(hideButton);
+}
 
+/* Look at a comment and decide whether it is from a guest or normal member, and whether
+ * it has been seen already.  Set the colors and view/hide state accordingly.
+ */
+function evaluateComment(comment, colorOnly) {
+    var commentBody = getCommentBody(comment);
+    var commentText = getCommentText(comment);
     var read  = isCommentSeen(comment);
     var guest = isCommentGuest(comment);
+    var visible = isCommentVisible(comment);
+
+    if(colorOnly === undefined)
+        colorOnly = false;
 
     var postType;
     if(guest)
@@ -184,13 +206,34 @@ function makeDynamic(comment) {
     comment.style.borderColor = color;
     if(switches['full hilight'])
         commentBody.style.background = color;
+    else
+        commentBody.style.background = null;
 
-    if((switches['hide guest'] && guest) || (switches['hide read'] && read))
-        click(hideButton);
+    if(colorOnly)
+        return;
 
-    if(!read)
-        GM_setValue('read-' + getCommentId(comment), true);
+    if((switches['hide guest'] && guest) || (switches['hide read'] && read)) {
+        /* The comment should be hidden. */
+        var hideButton = xpath('*//input[@value="Hide"]', false, comment);
+        if(hideButton)
+            /* Make a visible comment hidden. */
+            click(hideButton);
+    }
+    else {
+        /* The comment should be visible. */
+        var viewButton = xpath('*//input[@value="View"]', false, comment);
+        if(viewButton)
+            /* Make a hidden comment visible. */
+            click(viewButton);
+    }
 }
+
+function evaluateAll(colorOnly) {
+    /* Evaluate all comments (comment must be initialized first). */
+    var comments = xpath('//div[@class="CommentBox"]', true);
+    for(var a in comments)
+        evaluateComment(comments[a], colorOnly);
+};
 
 /* This is the main program entry after the page loads completely. */
 function main() {
@@ -261,10 +304,12 @@ function main() {
             box.checked = switches[optName];
             box.addEventListener('change', function(ev) {
                 GM_setValue(this.id, this.checked);
-                document.getElementById('reloadNotice').style.display = null;
+                switches[this.id] = this.checked;
+                var colorOnly = false;
+                if(this.id == 'full hilight')
+                    colorOnly = true;
+                evaluateAll(colorOnly);
             }, false);
-
-            document.getElementById(optName).checked = switches[optName];
         }
 
         /* Do the color boxes. */
@@ -292,6 +337,7 @@ function main() {
             var comments = xpath('//div[@class="CommentBox"]', true);
             for(var a in comments)
                 GM_setValue('read-' + getCommentId(comments[a]), true);
+            evaluateAll(true);
         }, false);
 
         /* Do the mark read button. */
@@ -299,6 +345,7 @@ function main() {
             var comments = xpath('//div[@class="CommentBox"]', true);
             for(var a in comments)
                 GM_setValue('read-' + getCommentId(comments[a]), false);
+            evaluateAll(true);
         }, false);
 
         var expander = document.getElementById('commentExpander');
@@ -320,8 +367,13 @@ function main() {
 
     /* Loop through all comments and make them dynamic. */
     var comments = xpath('//div[@class="CommentBox"]', true);
-    for(var a = 0; a < comments.length; a++)
-        makeDynamic(comments[a]);
+    for(var a = 0; a < comments.length; a++) {
+        var comment = comments[a];
+        makeDynamic(comment);
+        evaluateComment(comment);
+        /* No longer setting articles as read by default. */
+        //GM_setValue('read-' + getCommentId(comment), true);
+    }
 }
 
 window.addEventListener('load', main, true);
