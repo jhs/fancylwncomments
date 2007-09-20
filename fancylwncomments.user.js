@@ -354,15 +354,20 @@ function main() {
                 /* Open the config panel. */
                 commentBox.style.display = null;
                 expander.src = MINUS;
+                GM_setValue('widget open', true);
             }
             else if(expander.src == MINUS) {
                 /* Close the config panel. */
                 commentBox.style.display = 'none';
                 expander.src = PLUS;
+                GM_setValue('widget open', false);
             }
         };
 
         expander.addEventListener('click', toggleExpander, false);
+        if(GM_getValue('widget open', false))
+            /* Start in the open state. */
+            toggleExpander();
     }
 
     /* Loop through all comments and make them dynamic. */
