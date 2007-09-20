@@ -348,20 +348,21 @@ function main() {
         }, false);
 
         var expander = document.getElementById('commentExpander');
-        expander.state = 'closed';
-        expander.addEventListener('click', function(ev) {
+        var toggleExpander = function(ev) {
             var commentBox = document.getElementById('commentSettings');
-            if(this.src == PLUS) {
+            if(expander.src == PLUS) {
                 /* Open the config panel. */
                 commentBox.style.display = null;
-                this.src = MINUS;
+                expander.src = MINUS;
             }
-            else if(this.src == MINUS) {
+            else if(expander.src == MINUS) {
                 /* Close the config panel. */
                 commentBox.style.display = 'none';
-                this.src = PLUS;
+                expander.src = PLUS;
             }
-        }, false);
+        };
+
+        expander.addEventListener('click', toggleExpander, false);
     }
 
     /* Loop through all comments and make them dynamic. */
