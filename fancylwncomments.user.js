@@ -71,7 +71,7 @@ function click(node) {
 }
 
 /* Regular expressions used in the script */
-var guestFinder = /(Posted .* by guest )/;
+var guestFinder = /(Posted .* by .* \(guest, )/;
 var idFinder    = /^http:\/\/lwn.net\/Articles\/(\d+)\//;
 
 /* These functions are sort of hard-coded and could change if the HTML of the site changes. */
