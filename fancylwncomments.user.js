@@ -17,6 +17,9 @@
 // @include       http://lwn.net/Articles/*
 // ==/UserScript==
 
+/* Feel free to modify these two sets of configuration settings. */
+
+/* Colors for each type of comment */
 var colors = {
     'guest read'    : GM_getValue('guest read'   , '#ccff99'),
     'guest unread'  : GM_getValue('guest unread' , '#99ff99'),
@@ -24,11 +27,16 @@ var colors = {
     'member unread' : GM_getValue('member unread', '#ffcc99'),
 };
 
+/* UI behavior options */
 var switches = {
     'hide guest'  : GM_getValue('hide guest'  , false),
     'hide read'   : GM_getValue('hide read'   , false),
     'full hilight': GM_getValue('full hilight', false),
 };
+
+/*
+ * =-=-=-=-=-=-= No more user-configurable settings below this line =-=-=-=-=-=-=
+ */
 
 /* "Constants" */
 var PLUS = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAkAAAAJCAYAAADgkQYQAAAABmJLR0QA%2FwD%2FAP%2BgvaeTAAAACXBIWXMAAAsTAAALEwEAmpwYAAAAB3RJTUUH1wkTCwQhqAMmjAAAADZJREFUGNNjbGho%2BM9ACBBS1NDQ8J8JiziGJiYGIgALDhNgbEZ0RYxIChhJtg6bIkYMAWLCCQC%2FUA4P3D7t2wAAAABJRU5ErkJggg%3D%3D';
@@ -74,7 +82,12 @@ function click(node) {
 var guestFinder = /(Posted .* by .* \(guest, )/;
 var idFinder    = /^http:\/\/lwn.net\/Articles\/(\d+)\//;
 
-/* These functions are sort of hard-coded and could change if the HTML of the site changes. */
+/* XXX
+ * These functions are somewhat hard-coded and heavily dependent on the HTML
+ * coming from the site.  If the DOM tree of the site changes, they may need
+ * to be updated.
+ * XXX
+ */
 function getCommentTitle(comment) {
     return comment.childNodes[1];
 }
@@ -89,7 +102,7 @@ function getCommentHeading(comment) {
 }
 
 function getCommentText(comment) {
-    /* This function only works on comments processed by makeDynamic(). */
+    /* XXX: This function only works on comments already processed by makeDynamic(). */
     var body = getCommentBody(comment);
     return body.childNodes[2];
 }
@@ -107,11 +120,13 @@ function getCommentId(comment) {
     return result[1];
 }
 
+/* Return whether a particular comment ID has been marked as read. */
 function isCommentSeen(comment) {
     var id = getCommentId(comment);
     return GM_getValue('read-' + id, false);
 }
 
+/* Return whether a particular comment (the DOM node, not the ID) is from a guest. */
 function isCommentGuest(comment) {
     var result = guestFinder.exec(getCommentHeading(comment).textContent);
     if(result == null)
@@ -119,6 +134,7 @@ function isCommentGuest(comment) {
     return true;
 }
 
+/* Return whether a particular comment (the DOM node, not the ID) is visible. */
 function isCommentVisible(comment) {
     return (getCommentText(comment).style.display == "")
 }
@@ -132,6 +148,8 @@ function isCommentVisible(comment) {
 var handleClick = function(ev) {
     var comment        = this.parentNode.parentNode.parentNode;
     var commentBody    = getCommentBody(comment);
+
+    /* XXX: This may need updating if the site's HTML changes too much. */
     var commentText    = commentBody.childNodes[2];
 
     /* Either display or un-display the comment. */
