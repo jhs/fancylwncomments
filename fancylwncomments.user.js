@@ -1,5 +1,5 @@
 /*
- * Copyright 2007 Proven Corporation Co., Ltd., Thailand
+ * Copyright 2007-2008 Proven Corporation Co., Ltd., Thailand
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
