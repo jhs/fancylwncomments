@@ -17,14 +17,25 @@
 // @include       http://lwn.net/Articles/*
 // ==/UserScript==
 
-/* Feel free to modify these two sets of configuration settings. */
+/*
+ * Nothing in this script needs to be modified by hand.  To change the config, just click on stuff
+ * next to the config description in the "Comments" section of any LWN article.  
+ */
 
-/* Colors for each type of comment */
+/* Remember the color defaults. */
+var defaultColors = {
+    'guest read'    : '#ccff99',
+    'guest unread'  : '#99ff99',
+    'member read'   : '#ffff99',
+    'member unread' : '#ffcc99',
+};
+
+/* Actual colors for each type of comment */
 var colors = {
-    'guest read'    : GM_getValue('guest read'   , '#ccff99'),
-    'guest unread'  : GM_getValue('guest unread' , '#99ff99'),
-    'member read'   : GM_getValue('member read'  , '#ffff99'),
-    'member unread' : GM_getValue('member unread', '#ffcc99'),
+    'guest read'    : GM_getValue('guest read'   , defaultColors['guest read']),
+    'guest unread'  : GM_getValue('guest unread' , defaultColors['guest unread']),
+    'member read'   : GM_getValue('member read'  , defaultColors['member read']),
+    'member unread' : GM_getValue('member unread', defaultColors['member unread']),
 };
 
 /* UI behavior options */
@@ -297,10 +308,15 @@ function setColorBoxes() {
             /* Returns the current value of the color input box, or null if it is invalid. */
             var currentVal = input.value;
             var newVal = '#' + currentVal.replace(/[^0-9a-f]/, '');
+
+            if(newVal.length == 1 )
+                /* Go back to the default value. */
+                return defaultColors[postType];
+
             if((newVal.length == 4) || (newVal.length == 7))
                 return newVal;
-            else
-                return null;
+
+            return null;
         };
 
         /* This function sets the prompt background color as a kind of preview. */
