@@ -268,6 +268,12 @@ function setColorBoxes() {
                            '<input id="' + setID    + '" type="button" value="Set" /> ' +
                            '<input id="' + cancelID + '" type="button" value="Cancel" />';
 
+        /* If the user clicks Cancel, then just close everything down. */
+        var cancelButton = document.getElementById(cancelID);
+        cancelButton.addEventListener('click', function() {
+            editor.style.display = 'none';
+        }, false);
+
         /* This function sets the editor background color as a kind of preview. */
         var input = document.getElementById(inputID);
         var updateBackground = function() {
@@ -282,11 +288,7 @@ function setColorBoxes() {
         updateBackground();
         input.addEventListener('keyup', updateBackground, false);
 
-        var cancelButton = document.getElementById(cancelID);
-        cancelButton.addEventListener('click', function() {
-            editor.style.display = 'none';
-        }, false);
-
+        /* Finally, turn it all on. */
         editor.style.display = null;
     };
 
