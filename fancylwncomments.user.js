@@ -361,14 +361,17 @@ function main() {
               'Unread member' +
               '<a id="member unread" style="' + colorBoxStyle + '"></a>'+
              '</p>' +
+             '<div id="set member unread" style="' + colorConfigStyle + '"></div>' +
              '<p>' +
               'Read member' +
               '<a id="member read" style="' + colorBoxStyle + '"></a>'+
              '</p>' +
+             '<div id="set member read" style="' + colorConfigStyle + '"></div>' +
              '<p>' +
               'Unread guest' +
               '<a id="guest unread" style="' + colorBoxStyle + '"></a>'+
              '</p>' +
+             '<div id="set guest unread" style="' + colorConfigStyle + '"></div>' +
              '<p>' +
               'Read guest' +
               '<a id="guest read" style="' + colorBoxStyle + '"></a>' + 
