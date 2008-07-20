@@ -253,14 +253,21 @@ function evaluateAll(colorOnly) {
         evaluateComment(comments[a], colorOnly);
 };
 
+/* Set the colors in the color boxes in the config panel to indicate what each color of hilighting represents. */
 function setColorBoxes() {
-    /* Set the colors in the color boxes in the config panel to indicate what each color of hilighting
-     * represents.
-     */
+    var changeColor = function(ev) {
+        /* Bring up a prompt to change a color setting. */
+        var editorID = 'set ' + ev.target.id;
+        var editor   = document.getElementById(editorID);
+        editor.innerHTML = 'jason is cool';
+        editor.style.display = null;
+    };
 
     for(var postType in colors) {
         var node = document.getElementById(postType);
         node.style.background = colors[postType];
+
+        node.addEventListener('click', changeColor, false);
     }
 };
 
@@ -274,6 +281,7 @@ function main() {
     }
     else {
         var colorBoxStyle = 'position: absolute; right: 0; cursor: pointer; border: 1px solid black; width: 1em; height: 1em';
+        var colorConfigStyle = 'display: none; position: absolute; left: 150px; bottom: 90px; width: 200px;';
 
         var configBox = document.createElement('div');
         configBox.className = 'SideBox';
@@ -309,8 +317,9 @@ function main() {
              '</p>' +
              '<p>' +
               'Read guest' +
-              '<a id="guest read" style="' + colorBoxStyle + '"></a>'+
+              '<a id="guest read" style="' + colorBoxStyle + '"></a>' + 
              '</p>' +
+             '<div id="set guest read" style="' + colorConfigStyle + '"></div>' +
              '<p style="text-indent: 0px; margin: 0px;">' +
               '<input type="button" id="expandAll" value="Expand All" style="margin-bottom: 2px; width: 100%" />' +
              '</p>' +
