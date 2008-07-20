@@ -262,6 +262,8 @@ function main() {
         return;
     }
     else {
+        var colorBoxStyle = 'position: absolute; right: 0; cursor: pointer; border: 1px solid black; width: 1em; height: 1em';
+
         var configBox = document.createElement('div');
         configBox.className = 'SideBox';
         configBox.innerHTML =
@@ -284,19 +286,19 @@ function main() {
              '</p>' +
              '<p>' +
               'Unread member' +
-              '<a id="member unread" style="position: absolute; right: 0; cursor: pointer; border: 1px solid black; width: 1em; height: 1em"></a>'+
+              '<a id="member unread" style="' + colorBoxStyle + '"></a>'+
              '</p>' +
              '<p>' +
               'Read member' +
-              '<a id="member read" style="position: absolute; right: 0; cursor: pointer; border: 1px solid black; width: 1em; height: 1em"></a>'+
+              '<a id="member read" style="' + colorBoxStyle + '"></a>'+
              '</p>' +
              '<p>' +
               'Unread guest' +
-              '<a id="guest unread" style="position: absolute; right: 0; cursor: pointer; border: 1px solid black; width: 1em; height: 1em"></a>'+
+              '<a id="guest unread" style="' + colorBoxStyle + '"></a>'+
              '</p>' +
              '<p>' +
               'Read guest' +
-              '<a id="guest read" style="position: absolute; right: 0; cursor: pointer; border: 1px solid black; width: 1em; height: 1em"></a>'+
+              '<a id="guest read" style="' + colorBoxStyle + '"></a>'+
              '</p>' +
              '<p style="text-indent: 0px; margin: 0px;">' +
               '<input type="button" id="expandAll" value="Expand All" style="margin-bottom: 2px; width: 100%" />' +
