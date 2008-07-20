@@ -265,8 +265,8 @@ function main() {
         var configBox = document.createElement('div');
         configBox.className = 'SideBox';
         configBox.innerHTML =
-            '<p class="Header">' +
-            '<img style="cursor: pointer" id="commentExpander" src="'+ PLUS +'" />' +
+            '<p style="cursor: pointer" id="commentLabel" class="Header">' +
+            '<img id="commentExpander" src="'+ PLUS +'" />' +
             ' Comments' +
             '</p>' +
             '<div id="commentSettings" style="position: relative; padding-left: 1em; display: none">' +
@@ -365,8 +365,9 @@ function main() {
             evaluateAll(true);
         }, false);
 
+        var label    = document.getElementById('commentLabel')
         var expander = document.getElementById('commentExpander');
-        var toggleExpander = function(ev) {
+        var toggleViewable = function(ev) {
             var commentBox = document.getElementById('commentSettings');
             if(expander.src == PLUS) {
                 /* Open the config panel. */
@@ -382,10 +383,10 @@ function main() {
             }
         };
 
-        expander.addEventListener('click', toggleExpander, false);
+        label.addEventListener('click', toggleViewable, false);
         if(GM_getValue('widget open', false))
             /* Start in the open state. */
-            toggleExpander();
+            toggleViewable();
     }
 
     /* Loop through all comments and make them dynamic. */
