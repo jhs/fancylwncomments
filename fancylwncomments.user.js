@@ -259,13 +259,30 @@ function setColorBoxes() {
         /* Bring up a prompt to change a color setting. */
         var postType = ev.target.id;
         var editorID = 'set ' + postType;
+        var inputID  = postType + ' color';
+        var setID    = postType + ' set';
+        var cancelID = postType + ' cancel';
+
         var editor   = document.getElementById(editorID);
+        editor.innerHTML = '<input id="' + inputID  + '" style="width: 5em;" value="' + colors[postType] + '" /><br/>' +
+                           '<input id="' + setID    + '" type="button" value="Set" /> ' +
+                           '<input id="' + cancelID + '" type="button" value="Cancel" />';
 
-        editor.innerHTML = '<input id="' + postType + ' color" style="width: 5em;" value="' + colors[postType] + '" /><br/>' +
-                           '<input id="' + postType + ' set" type="button" value="Set" /> ' +
-                           '<input id="' + postType + ' cancel" type="button" value="Cancel" />';
+        /* Set the editor background color as a kind of preview. */
+        var input = document.getElementById(inputID);
+        var updateBackground = function() {
+            var currentVal = input.value;
+            var newVal = '#' + currentVal.replace(/[^0-9a-f]/, '');
+            if((newVal.length == 4) || (newVal.length == 7)) {
+                editor.style.background = newVal;
+            }
+        };
 
-        var cancelButton = document.getElementById(postType + ' cancel');
+        /* First make the background the current stored value.  But also make it update as the user enters new values. */
+        updateBackground();
+        input.addEventListener('keyup', updateBackground, false);
+
+        var cancelButton = document.getElementById(cancelID);
         cancelButton.addEventListener('click', function() {
             editor.style.display = 'none';
         }, false);
