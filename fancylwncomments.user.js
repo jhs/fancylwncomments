@@ -270,9 +270,6 @@ function setColorBoxes() {
             editor.style.display = 'none';
         }, false);
 
-        var setColor = function(ev) {
-        };
-
         editor.style.display = null;
     };
 
