@@ -257,9 +257,22 @@ function evaluateAll(colorOnly) {
 function setColorBoxes() {
     var changeColor = function(ev) {
         /* Bring up a prompt to change a color setting. */
-        var editorID = 'set ' + ev.target.id;
+        var postType = ev.target.id;
+        var editorID = 'set ' + postType;
         var editor   = document.getElementById(editorID);
-        editor.innerHTML = 'jason is cool';
+
+        editor.innerHTML = '<input id="' + postType + ' color" style="width: 5em;" value="' + colors[postType] + '" /><br/>' +
+                           '<input id="' + postType + ' set" type="button" value="Set" /> ' +
+                           '<input id="' + postType + ' cancel" type="button" value="Cancel" />';
+
+        var cancelButton = document.getElementById(postType + ' cancel');
+        cancelButton.addEventListener('click', function() {
+            editor.style.display = 'none';
+        }, false);
+
+        var setColor = function(ev) {
+        };
+
         editor.style.display = null;
     };
 
@@ -281,7 +294,7 @@ function main() {
     }
     else {
         var colorBoxStyle = 'position: absolute; right: 0; cursor: pointer; border: 1px solid black; width: 1em; height: 1em';
-        var colorConfigStyle = 'display: none; position: absolute; left: 150px; bottom: 90px; width: 200px;';
+        var colorConfigStyle = 'display: none; position: absolute; left: 150px; bottom: 90px; width: 125px; background: #ffcc99; border: 2px solid black; padding: 0.5ex;';
 
         var configBox = document.createElement('div');
         configBox.className = 'SideBox';
