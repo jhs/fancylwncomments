@@ -253,6 +253,17 @@ function evaluateAll(colorOnly) {
         evaluateComment(comments[a], colorOnly);
 };
 
+function setColorBoxes() {
+    /* Set the colors in the color boxes in the config panel to indicate what each color of hilighting
+     * represents.
+     */
+
+    for(var postType in colors) {
+        var node = document.getElementById(postType);
+        node.style.background = colors[postType];
+    }
+};
+
 /* This is the main program entry after the page loads completely. */
 function main() {
     /* Add the config section after the "Logged in as..." stuff. */
@@ -332,10 +343,7 @@ function main() {
         }
 
         /* Do the color boxes. */
-        for(var postType in colors) {
-            var node = document.getElementById(postType);
-            node.style.background = colors[postType];
-        }
+        setColorBoxes();
 
         /* The expand all button opens all currently hidden comments. */
         document.getElementById('expandAll').addEventListener('click', function(ev) {
