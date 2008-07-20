@@ -269,10 +269,12 @@ function setColorBoxes() {
                            '<input id="' + cancelID + '" type="button" value="Cancel" />';
 
         /* If the user clicks Cancel, then just close everything down. */
-        var cancelButton = document.getElementById(cancelID);
-        cancelButton.addEventListener('click', function() {
+        var closeConfig = function() {
             editor.style.display = 'none';
-        }, false);
+        };
+
+        var cancelButton = document.getElementById(cancelID);
+        cancelButton.addEventListener('click', closeConfig, false);
 
         var getCurrentVal = function() {
             /* Returns the current value of the color input box, or null if it is invalid. */
@@ -306,6 +308,7 @@ function setColorBoxes() {
                 colors[postType] = newVal;
                 GM_setValue(postType, newVal);
                 evaluateAll(true);
+                closeConfig();
             }
         };
         setButton.addEventListener('click', setNewColor, false);
