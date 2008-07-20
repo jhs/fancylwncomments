@@ -274,12 +274,21 @@ function setColorBoxes() {
             editor.style.display = 'none';
         }, false);
 
+        var getCurrentVal = function() {
+            /* Returns the current value of the color input box, or null if it is invalid. */
+            var currentVal = input.value;
+            var newVal = '#' + currentVal.replace(/[^0-9a-f]/, '');
+            if((newVal.length == 4) || (newVal.length == 7))
+                return newVal;
+            else
+                return null;
+        };
+
         /* This function sets the editor background color as a kind of preview. */
         var input = document.getElementById(inputID);
         var updateBackground = function() {
-            var currentVal = input.value;
-            var newVal = '#' + currentVal.replace(/[^0-9a-f]/, '');
-            if((newVal.length == 4) || (newVal.length == 7)) {
+            var newVal = getCurrentVal();
+            if(newVal != null) {
                 editor.style.background = newVal;
             }
         };
@@ -287,6 +296,19 @@ function setColorBoxes() {
         /* First make the background the current stored value.  But also make it update as the user enters new values. */
         updateBackground();
         input.addEventListener('keyup', updateBackground, false);
+
+        /* And of course the Set button sets the new color if it is valid. */
+        var setButton = document.getElementById(setID);
+        var setNewColor = function() {
+            var newVal = getCurrentVal();
+            if(newVal != null) {
+                unsafeWindow.console.info('Doing it');
+                colors[postType] = newVal;
+                GM_setValue(postType, newVal);
+                evaluateAll(true);
+            }
+        };
+        setButton.addEventListener('click', setNewColor, false);
 
         /* Finally, turn it all on. */
         editor.style.display = null;
