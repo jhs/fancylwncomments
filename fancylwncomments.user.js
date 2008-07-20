@@ -268,7 +268,7 @@ function setColorBoxes() {
                            '<input id="' + setID    + '" type="button" value="Set" /> ' +
                            '<input id="' + cancelID + '" type="button" value="Cancel" />';
 
-        /* Set the editor background color as a kind of preview. */
+        /* This function sets the editor background color as a kind of preview. */
         var input = document.getElementById(inputID);
         var updateBackground = function() {
             var currentVal = input.value;
