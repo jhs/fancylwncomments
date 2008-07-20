@@ -281,7 +281,7 @@ function setColorBoxes() {
         colorPrompt.style.display  = 'none';
         colorPrompt.style.position = 'absolute';
         colorPrompt.style.left     = '150px';
-        colorPrompt.style.width    = '125px';
+        colorPrompt.style.width    = '170px';
         colorPrompt.style.border   = '2px solid black';
         colorPrompt.style.padding  = '0.5ex';
         colorPrompt.style.zIndex   = '1';
@@ -290,10 +290,12 @@ function setColorBoxes() {
         var postType = ev.target.id;
         var inputID  = promptID + ' input'
         var setID    = promptID + ' set';
+        var resetID  = promptID + ' reset';
         var cancelID = promptID + ' cancel';
 
         colorPrompt.innerHTML = '<input id="' + inputID  + '" style="width: 5em;" value="' + colors[postType] + '" /><br/>' +
                                 '<input id="' + setID    + '" type="button" value="Set" /> ' +
+                                '<input id="' + resetID  + '" type="button" value="Reset" /> ' +
                                 '<input id="' + cancelID + '" type="button" value="Cancel" />';
 
         /* If the user clicks Cancel, then just close everything down. */
@@ -309,13 +311,8 @@ function setColorBoxes() {
             var currentVal = input.value;
             var newVal = '#' + currentVal.replace(/[^0-9a-f]/, '');
 
-            if(newVal.length == 1 )
-                /* Go back to the default value. */
-                return defaultColors[postType];
-
             if((newVal.length == 4) || (newVal.length == 7))
                 return newVal;
-
             return null;
         };
 
@@ -332,17 +329,27 @@ function setColorBoxes() {
         updateBackground();
         input.addEventListener('keyup', updateBackground, false);
 
+        var useColor = function(newVal) {
+            /* Commit with a particular color hex value and close everything out. */
+            colors[postType] = newVal;
+            GM_setValue(postType, newVal);
+            ev.target.style.background = newVal;
+            evaluateAll(true);
+            closeConfig();
+        };
+
+        /* If the user clicks Reset, use the default value. */
+        var resetButton = document.getElementById(resetID);
+        resetButton.addEventListener('click', function() {
+            useColor(defaultColors[postType]);
+        }, false);
+
         /* And of course the Set button sets the new color if it is valid. */
         var setButton = document.getElementById(setID);
         var setNewColor = function() {
             var newVal = getCurrentVal();
-            if(newVal != null) {
-                colors[postType] = newVal;
-                GM_setValue(postType, newVal);
-                ev.target.style.background = newVal;
-                evaluateAll(true);
-                closeConfig();
-            }
+            if(newVal != null)
+                useColor(newVal);
         };
         setButton.addEventListener('click', setNewColor, false);
 
