@@ -256,21 +256,38 @@ function evaluateAll(colorOnly) {
 /* Set the colors in the color boxes in the config panel to indicate what each color of hilighting represents. */
 function setColorBoxes() {
     var changeColor = function(ev) {
-        /* Bring up a prompt to change a color setting. */
-        var postType = ev.target.id;
-        var editorID = 'set ' + postType;
-        var inputID  = postType + ' color';
-        var setID    = postType + ' set';
-        var cancelID = postType + ' cancel';
+        var promptID = 'color prompt';
 
-        var editor   = document.getElementById(editorID);
-        editor.innerHTML = '<input id="' + inputID  + '" style="width: 5em;" value="' + colors[postType] + '" /><br/>' +
-                           '<input id="' + setID    + '" type="button" value="Set" /> ' +
-                           '<input id="' + cancelID + '" type="button" value="Cancel" />';
+        /* Possibly close any other color prompts. */
+        var oldPrompt = document.getElementById(promptID);
+        if(oldPrompt != null) {
+            oldPrompt.parentNode.removeChild(oldPrompt);
+        }
+
+        /* Bring up a prompt to change a color setting. */
+        var colorPrompt = document.createElement('div');
+        colorPrompt.id             = promptID;
+        colorPrompt.style.display  = 'none';
+        colorPrompt.style.position = 'absolute';
+        colorPrompt.style.left     = '150px';
+        colorPrompt.style.width    = '125px';
+        colorPrompt.style.border   = '2px solid black';
+        colorPrompt.style.padding  = '0.5ex';
+        colorPrompt.style.zIndex   = '1';
+        ev.target.parentNode.parentNode.insertBefore(colorPrompt, ev.target.parentNode);
+
+        var postType = ev.target.id;
+        var inputID  = promptID + ' input'
+        var setID    = promptID + ' set';
+        var cancelID = promptID + ' cancel';
+
+        colorPrompt.innerHTML = '<input id="' + inputID  + '" style="width: 5em;" value="' + colors[postType] + '" /><br/>' +
+                                '<input id="' + setID    + '" type="button" value="Set" /> ' +
+                                '<input id="' + cancelID + '" type="button" value="Cancel" />';
 
         /* If the user clicks Cancel, then just close everything down. */
         var closeConfig = function() {
-            editor.style.display = 'none';
+            colorPrompt.parentNode.removeChild(colorPrompt);
         };
 
         var cancelButton = document.getElementById(cancelID);
@@ -286,12 +303,12 @@ function setColorBoxes() {
                 return null;
         };
 
-        /* This function sets the editor background color as a kind of preview. */
+        /* This function sets the prompt background color as a kind of preview. */
         var input = document.getElementById(inputID);
         var updateBackground = function() {
             var newVal = getCurrentVal();
             if(newVal != null) {
-                editor.style.background = newVal;
+                colorPrompt.style.background = newVal;
             }
         };
 
@@ -314,7 +331,7 @@ function setColorBoxes() {
         setButton.addEventListener('click', setNewColor, false);
 
         /* Finally, turn it all on. */
-        editor.style.display = null;
+        colorPrompt.style.display = null;
     };
 
     for(var postType in colors) {
@@ -335,7 +352,6 @@ function main() {
     }
     else {
         var colorBoxStyle = 'position: absolute; right: 0; cursor: pointer; border: 1px solid black; width: 1em; height: 1em';
-        var colorConfigStyle = 'display: none; position: absolute; left: 150px; bottom: 90px; width: 125px; background: #ffcc99; border: 2px solid black; padding: 0.5ex; z-index: 1;';
 
         var configBox = document.createElement('div');
         configBox.className = 'SideBox';
@@ -361,22 +377,18 @@ function main() {
               'Unread member' +
               '<a id="member unread" style="' + colorBoxStyle + '"></a>'+
              '</p>' +
-             '<div id="set member unread" style="' + colorConfigStyle + '"></div>' +
              '<p>' +
               'Read member' +
               '<a id="member read" style="' + colorBoxStyle + '"></a>'+
              '</p>' +
-             '<div id="set member read" style="' + colorConfigStyle + '"></div>' +
              '<p>' +
               'Unread guest' +
               '<a id="guest unread" style="' + colorBoxStyle + '"></a>'+
              '</p>' +
-             '<div id="set guest unread" style="' + colorConfigStyle + '"></div>' +
              '<p>' +
               'Read guest' +
               '<a id="guest read" style="' + colorBoxStyle + '"></a>' + 
              '</p>' +
-             '<div id="set guest read" style="' + colorConfigStyle + '"></div>' +
              '<p style="text-indent: 0px; margin: 0px;">' +
               '<input type="button" id="expandAll" value="Expand All" style="margin-bottom: 2px; width: 100%" />' +
              '</p>' +
