@@ -306,6 +306,7 @@ function setColorBoxes() {
             if(newVal != null) {
                 colors[postType] = newVal;
                 GM_setValue(postType, newVal);
+                ev.target.style.background = newVal;
                 evaluateAll(true);
                 closeConfig();
             }
