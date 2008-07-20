@@ -304,7 +304,6 @@ function setColorBoxes() {
         var setNewColor = function() {
             var newVal = getCurrentVal();
             if(newVal != null) {
-                unsafeWindow.console.info('Doing it');
                 colors[postType] = newVal;
                 GM_setValue(postType, newVal);
                 evaluateAll(true);
