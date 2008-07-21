@@ -216,7 +216,6 @@ function makeDynamic(comment) {
         var content = preformatted.innerHTML;
         content = content.replace(/</g, '&lt;');
         content = content.replace(/>/g, '&gt;');
-        content = content.replace(/&/g, '&amp;');
         content = '<p>' + content.replace(/\n\n/g, '</p><p>') + '</p>';
 
         var unformatted  = document.createElement('div');
