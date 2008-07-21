@@ -43,6 +43,7 @@ var switches = {
     'hide guest'  : GM_getValue('hide guest'  , false),
     'hide read'   : GM_getValue('hide read'   , false),
     'full hilight': GM_getValue('full hilight', false),
+    'fix width'   : GM_getValue('fix width'   , false),
 };
 
 /*
@@ -395,6 +396,10 @@ function main() {
              '<p>' +
               '<label for="full hilight">More hilighting</label>' +
               '<input type="checkbox" id="full hilight" style="position: absolute; right: 0" />' +
+             '</p>' +
+             '<p>' +
+              '<label for="fix width">Correct Width</label>' +
+              '<input type="checkbox" id="fix width" style="position: absolute; right: 0" />' +
              '</p>' +
              '<p>' +
               'Unread member' +
