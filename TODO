@@ -2,6 +2,7 @@ Neat future features:
 
  * Always show your comments, perhaps highlighted with a new color
  * Hilight comments mentioning your LWN username
+ * Optional auto-mark-read whenever you load a page.
  * Change "Comments: XX" to "Comments: XX (YY unread)" on the front page,
    weekly edition, etc.
  * A "mark all read" button at the bottom too
