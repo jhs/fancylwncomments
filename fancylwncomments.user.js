@@ -206,6 +206,32 @@ function makeDynamic(comment) {
 
     var commentHeading = getCommentHeading(comment);
     commentHeading.appendChild(hideButton);
+
+    /* Also, if the comment is pre-formatted (input as "plain text"), add an invisible non-preformatted
+     * version for possible width fixing.
+     */
+    var preformatted = xpath('div[@class="FormattedComment"]/pre', false, commentText);
+    if(preformatted != null) {
+        var formattedDiv = preformatted.parentNode;
+
+        /* Create a non-preformatted div with the same text contents as the formatted version, except
+         * that flows like normal HTML.
+         */
+        var content = preformatted.innerHTML;
+        content = content.replace(/</g, '&lt;');
+        content = content.replace(/>/g, '&gt;');
+        content = content.replace(/&/g, '&amp;');
+        content = '<p>' + content.replace(/\n\n/g, '</p><p>') + '</p>';
+
+        var unformatted  = document.createElement('div');
+        unformatted.className = 'UnformattedComment';
+        unformatted.style.display = 'none'; // Start out hidden.
+        unformatted.innerHTML = content;
+
+        preformatted.parentNode.appendChild(unformatted);
+
+        unsafeWindow.console.debug('did one');
+    }
 }
 
 /* Look at a comment and decide whether it is from a guest or normal member, and whether
