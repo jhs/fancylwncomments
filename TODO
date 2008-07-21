@@ -1,0 +1,10 @@
+Neat future features:
+
+ * Always show your comments, perhaps highlighted with a new color
+ * Hilight comments mentioning your LWN username
+ * Always show comments from your friends (AKA “whitelist”)
+ * Keep a list of well-known developers and their user names, so their
+   comments will be hilighted.
+ * Keep a general username-to-website mapping which people can submit. When
+   an article loads, the mapping loads via AJAX and links all registered
+   usernames to their web sites.
