@@ -229,8 +229,6 @@ function makeDynamic(comment) {
         unformatted.innerHTML = content;
 
         preformatted.parentNode.appendChild(unformatted);
-
-        unsafeWindow.console.debug('did one');
     }
 }
 
