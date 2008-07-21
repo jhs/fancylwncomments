@@ -224,7 +224,7 @@ function makeDynamic(comment) {
         content = '<p>' + content.replace(/\n\n/g, '</p><p>') + '</p>';
 
         var unformatted  = document.createElement('div');
-        unformatted.className = 'UnformattedComment';
+        unformatted.className = 'UnformattedVersion';
         unformatted.style.display = 'none'; // Start out hidden.
         unformatted.innerHTML = content;
 
@@ -255,6 +255,26 @@ function evaluateComment(comment, colorOnly) {
     else
         postType += 'unread';
 
+    /* First, make sure the post width is corrected if needed. */
+    var preformattedVersion = xpath('div[@class="FormattedComment"]/pre', false, commentText);
+    if(preformattedVersion != null) {
+        /* makeDynamic ensures that all pre-formatted comments have sister versions that
+         * are unformatted.
+         */
+        var unformattedVersion = xpath('div[@class="UnformattedVersion"]', false, preformattedVersion.parentNode);
+        if(unformattedVersion != null) {
+            if(switches['fix width']) {
+                preformattedVersion.style.display = 'none';
+                unformattedVersion.style.display  = null;
+            }
+            else {
+                unformattedVersion.style.display  = 'none';
+                preformattedVersion.style.display = null;
+            }
+        }
+    }
+
+    /* Next, set the proper color. */
     var color = colors[postType];
     getCommentTitle(comment).style.background = color;
     comment.style.borderColor = color;
@@ -466,7 +486,7 @@ function main() {
                 GM_setValue(this.id, this.checked);
                 switches[this.id] = this.checked;
                 var colorOnly = false;
-                if(this.id == 'full hilight')
+                if((this.id == 'full hilight') || (this.id == 'fix width'))
                     colorOnly = true;
                 evaluateAll(colorOnly);
             }, false);
