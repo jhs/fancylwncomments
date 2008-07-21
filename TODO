@@ -2,6 +2,8 @@ Neat future features:
 
  * Always show your comments, perhaps highlighted with a new color
  * Hilight comments mentioning your LWN username
+ * Change "Comments: XX" to "Comments: XX (YY unread)" on the front page,
+   weekly edition, etc.
  * Always show comments from your friends (AKA “whitelist”)
  * Keep a list of well-known developers and their user names, so their
    comments will be hilighted.
