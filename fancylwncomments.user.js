@@ -539,7 +539,7 @@ function main() {
         };
 
         label.addEventListener('click', toggleViewable, false);
-        if(GM_getValue('widget open', false))
+        if(GM_getValue('widget open', true))
             /* Start in the open state. */
             toggleViewable();
     }
