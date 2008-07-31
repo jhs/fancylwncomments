@@ -16,3 +16,10 @@ Features
  * Keep a general username-to-website mapping which people can submit. When
    an article loads, the mapping loads via AJAX and links all registered
    usernames to their web sites.
+ * Talkinator support.  Add in the sidebar:
+   <iframe width=250 height=400 marginwidth=0 marginheight=0 scrolling=no
+   style='border: 1px solid #819dd4' frameborder=0
+   src='http://t8rd.info/$r?s=0&t=h&w=250&h=400&c=ffcc99&b=LWN&u=USER'>
+   </iframe>
+
+   But set the "USER" part to the LWN user's username.
