@@ -2,6 +2,8 @@ Bugs
 ====
 
  * A "mark all read" button at the bottom too
+ * Swap position of mark read / mark unread buttons so it's easier to
+   find the mark read button
 
 Features
 ========
