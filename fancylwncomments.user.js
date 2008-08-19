@@ -465,10 +465,10 @@ function main() {
               '<input type="button" id="hideAll" value="Hide All" style="margin-bottom: 2px; width: 100%" />' +
              '</p>' +
              '<p style="text-indent: 0px; margin: 0px;">' +
-              '<input type="button" id="markRead" value="Mark all Read" style="margin-bottom: 2px; width: 100%" />' +
+              '<input type="button" id="markUnread" value="Mark all Unread" style="margin-bottom: 2px; width: 100%" />' +
              '</p>' +
              '<p style="text-indent: 0px; margin: 0px;">' +
-              '<input type="button" id="markUnread" value="Mark all Unread" style="margin-bottom: 2px; width: 100%" />' +
+              '<input type="button" id="markRead" value="Mark all Read" style="margin-bottom: 2px; width: 100%" />' +
              '</p>' +
             '</div>';
 
